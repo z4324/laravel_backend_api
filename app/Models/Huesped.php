@@ -1,8 +1,20 @@
+<?php
+
 namespace App\Models;
-use Jenssegers\Mongodb\Eloquent\Model;
+
+use MongoDB\Laravel\Eloquent\Model;
 
 class Huesped extends Model
 {
+    protected $connection = 'mongodb';
     protected $collection = 'huespedes';
-    protected $fillable = ['nombre', 'correo', 'telefono', 'condominio_id', 'fecha_registro'];
+
+    protected $fillable = [
+        'nombre',
+        'apellidos',
+        'telefono',
+        'correo',
+        'contrasena',
+        'fecha_registro',
+    ];
 }
