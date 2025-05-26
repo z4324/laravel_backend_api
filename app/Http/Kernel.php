@@ -8,7 +8,6 @@ use Illuminate\Foundation\Http\Kernel as HttpKernel;
 class Kernel extends HttpKernel
 {
     protected $middleware = [
-        // ...otros middlewares globales...
         \Fruitcake\Cors\HandleCors::class,
     ];
 
@@ -23,7 +22,6 @@ class Kernel extends HttpKernel
         ],
 
         'api' => [
-            // CORS debe estar aquí también
             \Fruitcake\Cors\HandleCors::class,
             'throttle:api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,

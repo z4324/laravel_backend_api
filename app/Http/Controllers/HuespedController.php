@@ -32,7 +32,6 @@ class HuespedController extends Controller
             'fecha_registro' => now(),
         ]);
 
-        // Depuración: ¿se creó el registro?
         if ($huesped && $huesped->_id) {
             return response()->json(['ok' => true, 'huesped' => $huesped]);
         } else {
