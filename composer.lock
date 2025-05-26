@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c96f982241e2f6c2a5c18bee99bd417e",
+"content-hash": "c96f982241e2f6c2a5c18bee99bd417e",
     "packages": [
         {
             "name": "brick/math",
@@ -1055,6 +1055,7 @@
             "time": "2025-02-03T10:55:03+00:00"
         },
         {
+<<<<<<< HEAD
             "name": "jenssegers/mongodb",
             "version": "5.4.1",
             "source": {
@@ -1157,6 +1158,8 @@
             "time": "2025-04-22T08:22:29+00:00"
         },
         {
+=======
+>>>>>>> 92964c5b4ef3a2dd11b0f3458c909954a06811ba
             "name": "laravel/framework",
             "version": "v12.15.0",
             "source": {
@@ -2109,6 +2112,7 @@
             "time": "2024-12-08T08:18:47+00:00"
         },
         {
+<<<<<<< HEAD
             "name": "mongodb/mongodb",
             "version": "2.1.0",
             "source": {
@@ -2186,6 +2190,8 @@
             "time": "2025-05-23T10:48:05+00:00"
         },
         {
+=======
+>>>>>>> 92964c5b4ef3a2dd11b0f3458c909954a06811ba
             "name": "monolog/monolog",
             "version": "3.9.0",
             "source": {
@@ -4974,6 +4980,7 @@
             "time": "2024-09-09T11:45:10+00:00"
         },
         {
+<<<<<<< HEAD
             "name": "symfony/polyfill-php85",
             "version": "v1.32.0",
             "source": {
@@ -5050,6 +5057,8 @@
             "time": "2025-05-02T08:40:52+00:00"
         },
         {
+=======
+>>>>>>> 92964c5b4ef3a2dd11b0f3458c909954a06811ba
             "name": "symfony/polyfill-uuid",
             "version": "v1.32.0",
             "source": {
