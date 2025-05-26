@@ -64,4 +64,15 @@ class HuespedController extends Controller
         'fecha_registro' => $huesped->fecha_registro,
     ]]);
 }
+public function list()
+{
+    $huespedes = \App\Models\Huesped::all(['_id', 'nombre']);
+    $result = $huespedes->map(function($h){
+        return [
+            'id' => (string)$h->_id,
+            'nombre' => $h->nombre
+        ];
+    });
+    return response()->json($result);
+}
 }
