@@ -31,11 +31,8 @@ return [
 
     'connections' => [
 
-<<<<<<< HEAD
  /*        'sqlite' => [
-=======
         'sqlite' => [
->>>>>>> 92964c5b4ef3a2dd11b0f3458c909954a06811ba
             'driver' => 'sqlite',
             'url' => env('DB_URL'),
             'database' => env('DB_DATABASE', database_path('database.sqlite')),
@@ -114,7 +111,6 @@ return [
             'prefix_indexes' => true,
             // 'encrypt' => env('DB_ENCRYPT', 'yes'),
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
-<<<<<<< HEAD
         ], */
 
         'mongodb' => [
@@ -124,8 +120,6 @@ return [
             'database' => env('DB_DATABASE', 'luxury'),
             'username' => env('DB_USERNAME', ''),
             'password' => env('DB_PASSWORD', ''),
-=======
->>>>>>> 92964c5b4ef3a2dd11b0f3458c909954a06811ba
         ],
 
     ],
