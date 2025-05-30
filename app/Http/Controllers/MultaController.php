@@ -28,6 +28,7 @@ class MultaController extends Controller
             'fecha_emision' => $request->fecha_emision,
             'estado' => $request->estado,
             'huesped_id' => $request->huesped_id,
+            'fecha_notificacion' => now(),
         ]);
 
         return response()->json(['ok' => true, 'multa' => $multa]);
@@ -35,16 +36,41 @@ class MultaController extends Controller
 
     public function multasPorHuesped($id)
     {
-        $multas = \App\Models\Multa::where('huesped_id', $id)->get();
+        $multas = Multa::where('huesped_id', $id)
+            ->orderBy('fecha_notificacion', 'desc')
+            ->get();
+
         $result = $multas->map(function($m){
             return [
-                'id_multa' => (string)$m->_id,
+                '_id' => (string)$m->_id,
                 'monto' => $m->monto,
                 'motivo' => $m->motivo,
                 'fecha_emision' => $m->fecha_emision,
                 'estado' => $m->estado,
+                'fecha_notificacion' => $m->fecha_notificacion,
             ];
         });
+        
         return response()->json($result);
+    }
+
+    public function multaRecientePorHuesped($id)
+    {
+        $multa = Multa::where('huesped_id', $id)
+            ->orderBy('fecha_notificacion', 'desc')
+            ->first();
+
+        if (!$multa) {
+            return response()->json(null);
+        }
+
+        return response()->json([
+            '_id' => (string)$multa->_id,
+            'monto' => $multa->monto,
+            'motivo' => $multa->motivo,
+            'fecha_emision' => $multa->fecha_emision,
+            'estado' => $multa->estado,
+            'fecha_notificacion' => $multa->fecha_notificacion,
+        ]);
     }
 }
