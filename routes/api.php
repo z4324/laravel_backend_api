@@ -10,3 +10,4 @@ Route::get('/huespedes', [HuespedController::class, 'list']);
 Route::post('/multas', [MultaController::class, 'store']);
 Route::get('/multas/huesped/reciente/{id}', [MultaController::class, 'multaRecientePorHuesped']);
 Route::get('/multas/huesped/{id}', [MultaController::class, 'multasPorHuesped']);
+Route::put('/multas/{id}/vista', [MultaController::class, 'marcarComoVista']);

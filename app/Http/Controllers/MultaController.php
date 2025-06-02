@@ -29,6 +29,7 @@ class MultaController extends Controller
             'estado' => $request->estado,
             'huesped_id' => $request->huesped_id,
             'fecha_notificacion' => now(),
+            'vista' => false, 
         ]);
 
         return response()->json(['ok' => true, 'multa' => $multa]);
@@ -48,10 +49,25 @@ class MultaController extends Controller
                 'fecha_emision' => $m->fecha_emision,
                 'estado' => $m->estado,
                 'fecha_notificacion' => $m->fecha_notificacion,
+                'vista' => $m->vista, 
             ];
         });
         
         return response()->json($result);
+    }
+
+    public function marcarComoVista($id)
+    {
+        \Log::info("Intentando marcar multa como vista, ID: {$id}");
+        $multa = Multa::find($id);
+        if (!$multa) {
+            \Log::error("Multa no encontrada para ID: {$id}");
+            return response()->json(['error' => 'Multa no encontrada'], 404);
+        }
+        $multa->vista = true;
+        $multa->save();
+        \Log::info("Multa marcada como vista: {$id}");
+        return response()->json(['ok' => true, 'multa' => $multa]);
     }
 
     public function multaRecientePorHuesped($id)
@@ -71,6 +87,8 @@ class MultaController extends Controller
             'fecha_emision' => $multa->fecha_emision,
             'estado' => $multa->estado,
             'fecha_notificacion' => $multa->fecha_notificacion,
+            'vista' => $multa->vista,
         ]);
     }
+
 }

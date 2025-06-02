@@ -16,6 +16,7 @@ class Multa extends Model
         'estado',
         'huesped_id',
         'fecha_notificacion',
+        'vista',
 
     ];
 }
