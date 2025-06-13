@@ -2,6 +2,23 @@
 
 use App\Http\Controllers\HuespedController;
 use App\Http\Controllers\MultaController;
+use Illuminate\Http\Request;
+
+Route::middleware('auth:sanctum')->get('/user', function () {
+    return response()->json(auth()->user());
+});
+
+Route::post('/login', function (Request $request) {
+    $user = User::find(100);
+
+    $token = $user->createToken('token')->plainTextToken;
+    return response()->json([
+        'token' => $token,
+        'status' => 200
+    ]);
+});
+
+
 
 Route::post('/register', [HuespedController::class, 'register']);
 Route::post('/login', [HuespedController::class, 'login']);
