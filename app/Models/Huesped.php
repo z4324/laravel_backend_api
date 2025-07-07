@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
-use MongoDB\Laravel\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
 
-class Huesped extends Model
+class Huesped extends Authenticatable
 {
-    protected $connection = 'mongodb';
-    protected $collection = 'huespedes';
+    use HasApiTokens, Notifiable;
+
+    protected $table = 'huespedes';
 
     protected $fillable = [
         'nombre',
@@ -17,4 +20,9 @@ class Huesped extends Model
         'contrasena',
         'fecha_registro',
     ];
+
+    public function getAuthPassword()
+    {
+        return $this->contrasena;
+    }
 }

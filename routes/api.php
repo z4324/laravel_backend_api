@@ -2,9 +2,10 @@
 
 use App\Http\Controllers\HuespedController;
 use App\Http\Controllers\MultaController;
+use App\Http\Controllers\SessionController;
 use Illuminate\Http\Request;
 
-Route::middleware('auth:sanctum')->get('/user', function () {
+/* Route::middleware('auth:sanctum')->get('/user', function () {
     return response()->json(auth()->user());
 });
 
@@ -18,13 +19,18 @@ Route::post('/login', function (Request $request) {
     ]);
 });
 
-
+ */
 
 Route::post('/register', [HuespedController::class, 'register']);
 Route::post('/login', [HuespedController::class, 'login']);
-Route::get('/huespedes', [HuespedController::class, 'list']);
 
-Route::post('/multas', [MultaController::class, 'store']);
-Route::get('/multas/huesped/reciente/{id}', [MultaController::class, 'multaRecientePorHuesped']);
-Route::get('/multas/huesped/{id}', [MultaController::class, 'multasPorHuesped']);
-Route::put('/multas/{id}/vista', [MultaController::class, 'marcarComoVista']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/huespedes', [HuespedController::class, 'list']);
+    Route::post('/multas', [MultaController::class, 'store']);
+    Route::get('/multas/huesped/{id}', [MultaController::class, 'multasPorHuesped']);
+    Route::post('/multas/{id}/vista', [MultaController::class, 'marcarComoVista']);
+    Route::get('/multas/reciente/{id}', [MultaController::class, 'multaRecientePorHuesped']);
+    Route::get('/sesiones', [SessionController::class, 'index']);
+    Route::delete('/sesiones/{id}', [SessionController::class, 'destroy']);
+    Route::delete('/sesiones', [SessionController::class, 'destroyAllExceptCurrent']);
+});
