@@ -11,6 +11,7 @@ class Sesion extends Model
     protected $fillable = [
         'user_id',
         'token',
+        'token_id',
         'user_agent',
         'ip_address',
         'inicio',

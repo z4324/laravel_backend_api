@@ -16,11 +16,17 @@ class MultaController extends Controller
             'motivo' => 'required|string',
             'fecha_emision' => 'required|date',
             'estado' => 'required|in:pendiente,pagada',
+            'fecha_notificacion' => 'nullable|date',
         ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
+
+        $request->merge([
+        'fecha_notificacion' => now()
+        ]);
+
 
         $multa = Multa::create($request->all());
         return response()->json($multa, 201);
