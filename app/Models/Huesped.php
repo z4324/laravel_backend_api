@@ -18,6 +18,7 @@ class Huesped extends Authenticatable
         'telefono',
         'correo',
         'contrasena',
+        'rol', 
         'fecha_registro',
     ];
 

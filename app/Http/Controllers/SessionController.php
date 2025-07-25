@@ -9,21 +9,26 @@ use Laravel\Sanctum\PersonalAccessToken;
 
 class SessionController extends Controller
 {
-    public function index()
-    {
-        $userId = Auth::id();
-        $sesiones = Sesion::where('user_id', $userId)
-            ->where('estado', 'activa')
-            ->orderBy('inicio', 'desc')
-            ->get();
-        
-        $sesiones->each(function ($sesion) {
-            $sesion->fecha_inicio = $sesion->inicio;
-            $sesion->ip = $sesion->ip_address;
-        });
-        
-        return response()->json($sesiones);
+public function index(Request $request)
+{
+    $userId = Auth::id();
+    $currentToken = $request->bearerToken();
+
+    $sesion = Sesion::where('user_id', $userId)
+        ->where('token', $currentToken)
+        ->where('estado', 'activa')
+        ->first();
+
+    if (!$sesion) {
+        return response()->json(['message' => 'Sesión inválida.'], 401);
     }
+
+    return response()->json([
+        'fecha_inicio' => $sesion->inicio,
+        'ip' => $sesion->ip_address,
+    ]);
+}
+
 
     public function destroy($id)
     {
@@ -104,4 +109,13 @@ class SessionController extends Controller
 
         return response()->json(['message' => 'Sesión actual cerrada.']);
     }
+    public function destroyAll(Request $request)
+{
+    $userId = Auth::id();
+
+    Sesion::where('user_id', $userId)->delete();
+
+    return response()->json(['message' => 'Todas las sesiones eliminadas.']);
+}
+
 }

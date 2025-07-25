@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Huesped;
 use App\Models\Sesion;
+use App\Models\CodigoSeguridad;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -12,6 +13,10 @@ use Laravel\Sanctum\PersonalAccessToken;
 
 class HuespedController extends Controller
 {
+    public function list()
+{
+    return response()->json(Huesped::all());
+}
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -31,6 +36,7 @@ class HuespedController extends Controller
             'apellidos' => $request->apellidos,
             'telefono' => $request->telefono,
             'correo' => $request->correo,
+            'rol' => 'huesped',
             'contrasena' => Hash::make($request->contrasena),
             'fecha_registro' => now(),
         ]);
@@ -38,49 +44,7 @@ class HuespedController extends Controller
         return response()->json($huesped, 201);
     }
 
-    public function login(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'correo' => 'required|email',
-            'contrasena' => 'required|string',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
-
-        $huesped = Huesped::where('correo', $request->correo)->first();
-
-        if (!$huesped || !\Hash::check($request->contrasena, $huesped->contrasena)) {
-            return response()->json(['error' => 'Credenciales inválidas'], 401);
-        }
-
-        $tokenInstance = $huesped->createToken('huesped_token');
-        $token = $tokenInstance->plainTextToken;
-        $tokenId = $tokenInstance->accessToken->id; 
-
-        Sesion::create([
-            'user_id'    => $huesped->id,
-            'token'      => $token,
-            'token_id'   => $tokenId, 
-            'user_agent' => $request->header('User-Agent'),
-            'ip_address' => $request->ip(),
-            'inicio'     => now(),
-            'estado'     => 'activa',
-        ]);
-
-        return response()->json([
-            'huesped' => $huesped,
-            'token'   => $token,
-        ]);
-    }
-
-    public function list()
-    {
-        return response()->json(Huesped::all());
-    }
-
-    public function editarPerfil(Request $request)
+        public function editarPerfil(Request $request)
 {
     $user = Auth::user();
 
@@ -114,63 +78,100 @@ class HuespedController extends Controller
     ]);
 }
 
-    public function cambiarCorreo(Request $request)
+    public function login(Request $request)
     {
-        $user = Auth::user();
-
         $validator = Validator::make($request->all(), [
-            'nuevo_correo' => 'required|email|unique:huespedes,correo,' . $user->id,
-            'contrasena_actual' => 'required|string',
+            'correo' => 'required|email',
+            'contrasena' => 'required|string',
         ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
 
-        if (!\Hash::check($request->contrasena_actual, $user->contrasena)) {
-            return response()->json(['error' => 'Contraseña actual incorrecta'], 401);
+        $huesped = Huesped::where('correo', $request->correo)->first();
+
+        if (!$huesped || !Hash::check($request->contrasena, $huesped->contrasena)) {
+            return response()->json(['error' => 'Credenciales inválidas'], 401);
         }
 
-        $user->correo = $request->nuevo_correo;
-        $user->save();
+        $tokenInstance = $huesped->createToken('huesped_token');
+        $token = $tokenInstance->plainTextToken;
+        $tokenId = $tokenInstance->accessToken->id; 
 
-        $tokens = $user->tokens()->pluck('id');
-        PersonalAccessToken::whereIn('id', $tokens)->delete();
-        Sesion::where('user_id', $user->id)->update(['estado' => 'inactiva']);
+        Sesion::create([
+            'user_id'    => $huesped->id,
+            'token'      => $token,
+            'token_id'   => $tokenId, 
+            'user_agent' => $request->header('User-Agent'),
+            'ip_address' => $request->ip(),
+            'inicio'     => now(),
+            'estado'     => 'activa',
+        ]);
 
         return response()->json([
-            'message' => 'Correo actualizado correctamente.',
-            'cerrar_sesion' => true
+            'huesped' => $huesped,
+            'token'   => $token,
         ]);
     }
 
-    public function cambiarContrasena(Request $request)
+    public function actualizarContrasena(Request $request)
     {
-        $user = Auth::user();
-
         $validator = Validator::make($request->all(), [
-            'contrasena_actual' => 'required|string',
-            'nueva_contrasena' => 'required|string|min:6',
+            'correo' => 'required|email|exists:huespedes,correo',
+            'codigo' => 'required|numeric',
+            'nueva_contrasena' => 'required|string|min:6|confirmed',
         ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
 
-        if (!\Hash::check($request->contrasena_actual, $user->contrasena)) {
-            return response()->json(['error' => 'Contraseña actual incorrecta'], 401);
+        $huesped = Huesped::where('correo', $request->correo)->first();
+
+        $codigoDB = CodigoSeguridad::where('huesped_id', $huesped->id)
+            ->where('codigo', $request->codigo)
+            ->where('expires_at', '>', now())
+            ->first();
+
+        if (!$codigoDB) {
+            return response()->json(['error' => 'Código incorrecto o expirado.'], 400);
         }
 
-        $user->contrasena = \Hash::make($request->nueva_contrasena);
-        $user->save();
+        $huesped->contrasena = Hash::make($request->nueva_contrasena);
+        $huesped->save();
 
-        $tokens = $user->tokens()->pluck('id');
+        $codigoDB->delete();
+
+        $tokens = $huesped->tokens()->pluck('id');
         PersonalAccessToken::whereIn('id', $tokens)->delete();
-        Sesion::where('user_id', $user->id)->update(['estado' => 'inactiva']);
+        Sesion::where('user_id', $huesped->id)->update(['estado' => 'inactiva']);
 
         return response()->json([
-            'message' => 'Contraseña actualizada correctamente.',
-            'cerrar_sesion' => true
+            'message' => 'Contraseña actualizada correctamente. Ahora puedes iniciar sesión.',
+            'redirigir' => '/login'
         ]);
     }
+    public function newPassword(Request $request)
+{
+    $user = Auth::user();
+
+    $validator = Validator::make($request->all(), [
+        'contrasena_actual' => 'required|string',
+        'nueva_contrasena' => 'required|string|min:6|confirmed',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json($validator->errors(), 422);
+    }
+
+    if (!Hash::check($request->contrasena_actual, $user->contrasena)) {
+        return response()->json(['error' => 'La contraseña actual es incorrecta.'], 400);
+    }
+
+    $user->contrasena = Hash::make($request->nueva_contrasena);
+    $user->save();
+
+    return response()->json(['message' => 'Contraseña actualizada correctamente.']);
+}
 }

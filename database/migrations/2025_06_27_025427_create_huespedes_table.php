@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('telefono');
             $table->string('correo')->unique();
             $table->string('contrasena');
+            $table->string('rol')->default('huesped'); 
             $table->timestamp('fecha_registro')->nullable();
             $table->timestamps();
         });
