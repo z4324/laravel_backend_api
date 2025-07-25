@@ -9,36 +9,65 @@ use Laravel\Sanctum\PersonalAccessToken;
 
 class SessionController extends Controller
 {
-public function index(Request $request)
-{
-    $userId = Auth::id();
-    $currentToken = $request->bearerToken();
-
-    $sesion = Sesion::where('user_id', $userId)
-        ->where('token', $currentToken)
-        ->where('estado', 'activa')
-        ->first();
-
-    if (!$sesion) {
-        return response()->json(['message' => 'Sesión inválida.'], 401);
+    private function getCurrentUser()
+    {
+        if (Auth::guard('admin-sanctum')->check()) {
+            return Auth::guard('admin-sanctum')->user();
+        }
+        
+        if (Auth::guard('sanctum')->check()) {
+            return Auth::guard('sanctum')->user();
+        }
+        
+        return null;
     }
 
-    return response()->json([
-        'fecha_inicio' => $sesion->inicio,
-        'ip' => $sesion->ip_address,
-    ]);
-}
+    private function getCurrentUserId()
+    {
+        $user = $this->getCurrentUser();
+        return $user ? $user->id : null;
+    }
+
+    public function index(Request $request)
+    {
+        $userId = $this->getCurrentUserId();
+        $currentToken = $request->bearerToken();
+
+        if (!$userId) {
+            return response()->json(['message' => 'Usuario no autenticado.'], 401);
+        }
+
+        $sesion = Sesion::where('user_id', $userId)
+            ->where('token', $currentToken)
+            ->where('estado', 'activa')
+            ->first();
+
+        if (!$sesion) {
+            return response()->json(['message' => 'Sesión inválida.'], 401);
+        }
+
+        return response()->json([
+            'fecha_inicio' => $sesion->inicio,
+            'ip' => $sesion->ip_address,
+        ]);
+    }
 
 
     public function destroy($id)
     {
+        $userId = $this->getCurrentUserId();
+        
+        if (!$userId) {
+            return response()->json(['message' => 'Usuario no autenticado.'], 401);
+        }
+
         $sesion = Sesion::find($id);
 
         if (!$sesion) {
             return response()->json(['message' => 'Sesión no encontrada.'], 404);
         }
 
-        if ($sesion->user_id !== Auth::id()) {
+        if ($sesion->user_id !== $userId) {
             return response()->json(['message' => 'No autorizado.'], 403);
         }
 
@@ -55,8 +84,12 @@ public function index(Request $request)
 
     public function destroyAllExceptCurrent(Request $request)
     {
-        $userId = Auth::id();
+        $userId = $this->getCurrentUserId();
         $currentToken = $request->bearerToken();
+
+        if (!$userId) {
+            return response()->json(['message' => 'Usuario no autenticado.'], 401);
+        }
 
         if (!$currentToken) {
             return response()->json(['message' => 'Token no encontrado.'], 400);
@@ -86,8 +119,12 @@ public function index(Request $request)
 
     public function destroyCurrent(Request $request)
     {
-        $userId = Auth::id();
+        $userId = $this->getCurrentUserId();
         $currentToken = $request->bearerToken();
+
+        if (!$userId) {
+            return response()->json(['message' => 'Usuario no autenticado.'], 401);
+        }
 
         if (!$currentToken) {
             return response()->json(['message' => 'Token no encontrado.'], 400);
@@ -109,13 +146,18 @@ public function index(Request $request)
 
         return response()->json(['message' => 'Sesión actual cerrada.']);
     }
+
     public function destroyAll(Request $request)
-{
-    $userId = Auth::id();
+    {
+        $userId = $this->getCurrentUserId();
 
-    Sesion::where('user_id', $userId)->delete();
+        if (!$userId) {
+            return response()->json(['message' => 'Usuario no autenticado.'], 401);
+        }
 
-    return response()->json(['message' => 'Todas las sesiones eliminadas.']);
-}
+        Sesion::where('user_id', $userId)->delete();
+
+        return response()->json(['message' => 'Todas las sesiones eliminadas.']);
+    }
 
 }

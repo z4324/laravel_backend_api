@@ -44,6 +44,10 @@ return [
             'driver' => 'sanctum',
             'provider' => 'huespedes',
         ],
+        'admin-sanctum' => [
+            'driver' => 'sanctum',
+            'provider' => 'admins',
+        ],
     ],
 
     /*
@@ -72,6 +76,11 @@ return [
         'huespedes' => [
             'driver' => 'eloquent',
             'model' => App\Models\Huesped::class,
+        ],
+
+        'admins' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Admin::class,
         ],
 
         // 'users' => [
