@@ -5,6 +5,7 @@ use App\Http\Controllers\MultaController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\CodigoSeguridadController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\TelemetriaController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -30,6 +31,11 @@ Route::post('/validar-codigo', [CodigoSeguridadController::class, 'validarCodigo
 // Rutas públicas para administradores
 Route::post('/admin/register', [AdminController::class, 'register']);
 Route::post('/admin/login', [AdminController::class, 'login']);
+
+// Rutas públicas para telemetría (Wear OS)
+Route::post('/telemetria', [TelemetriaController::class, 'store']);
+Route::get('/telemetria', [TelemetriaController::class, 'index']);
+Route::get('/telemetria/estadisticas', [TelemetriaController::class, 'estadisticas']);
 
 // Rutas protegidas para huéspedes
 Route::middleware(['auth:sanctum', \App\Http\Middleware\CheckRoleHuesped::class])->group(function () {
