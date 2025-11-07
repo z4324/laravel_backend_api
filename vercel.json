@@ -4,11 +4,19 @@
     {
       "src": "api/index.php",
       "use": "vercel-php@0.6.0"
+    },
+    {
+      "src": "public/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
     {
-      "src": "/(css|js|images)/(.*)",
+      "src": "/build/(.*)",
+      "dest": "public/build/$1"
+    },
+    {
+      "src": "/(css|js|images|favicon.ico|robots.txt)/(.*)",
       "dest": "public/$1/$2"
     },
     {
@@ -28,5 +36,6 @@
     "CACHE_DRIVER": "array",
     "LOG_CHANNEL": "stderr",
     "SESSION_DRIVER": "cookie"
-  }
+  },
+  "framework": null
 }
