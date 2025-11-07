@@ -69,8 +69,7 @@ class TelemetriaController extends Controller
                 'registros_insertados' => $insertados,
                 'trabajador_id' => $trabajadorId
             ], 201);
- 
-            
+
         } catch (\Exception $e) {
             DB::rollBack();
             
