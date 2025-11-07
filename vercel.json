@@ -6,8 +6,11 @@
       "use": "vercel-php@0.6.0"
     },
     {
-      "src": "public/**",
-      "use": "@vercel/static"
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "public"
+      }
     }
   ],
   "routes": [
@@ -16,8 +19,8 @@
       "dest": "public/build/$1"
     },
     {
-      "src": "/(css|js|images|favicon.ico|robots.txt)/(.*)",
-      "dest": "public/$1/$2"
+      "src": "/(css|js|images|favicon.ico|robots.txt)",
+      "dest": "public/$1"
     },
     {
       "src": "/(.*)",
@@ -36,6 +39,5 @@
     "CACHE_DRIVER": "array",
     "LOG_CHANNEL": "stderr",
     "SESSION_DRIVER": "cookie"
-  },
-  "framework": null
+  }
 }
